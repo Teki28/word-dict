@@ -1,6 +1,6 @@
 <template>
   <header>
-    <h2 class="title">{{wordVal ? wordVal : 'Word Hunt'}}</h2>
+    <h2 class="title">{{wordVal ? wordVal : '百京的爷就是爷'}}</h2>
     <div class="input-wrap">
       <input type="text" name="" id="" placeholder="Search a Word" v-model="wordVal" @input="$emit('update:modelValue',$event.target.value)">
     </div>
