@@ -80,7 +80,8 @@ function addToList (index) {
       duration: 5000
     })
   }
-  // location.reload();
+  msg();
+  setTimeout('location.reload();', 3000)
   msg();
 
 
