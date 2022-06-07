@@ -11,10 +11,11 @@
         </span>
         <i class="iconfont icon-shengyin" @click="handleClick(index)"></i>
         <audio :src="definition?.phonetics[0]?.audio" ref="audio"></audio>
+        <el-button round class="addBTN" type="info" @click="addToList(index)">Add to Today's List</el-button>
       </div>
       <div class="meanings">
         <div class="meaning" v-for="(meaning,index) in definition.meanings" :key="index">
-          <span class="partOfSpeech">{{meaning.partOfSpeech}}</span>
+          <span :class="bw==true?'partOfSpeech-night':'partOfSpeech-day'">{{meaning.partOfSpeech}}</span>
           <span class="word-meaning">
             {{
               meaning.definitions.map(definition=>definition.definition).join(' ')
@@ -28,13 +29,16 @@
 
 <script setup>
 import axios from 'axios'
-import { watch, ref } from 'vue'
+import { watch, ref, nextTick } from 'vue'
+import { ElMessage } from 'element-plus'
 const props = defineProps({
   searchWord: String,
+  bw: Boolean
 });
 watch(() => props.searchWord, getData)
 const result = ref([]);
-const audio = ref()
+const audio = ref();
+const wordInfo = ref({ word: 'aa', definition: 'bb', value: 'cc' })
 function handleClick (index) {
   audio.value[index].currentTime = 0;
   audio.value[index].play();
@@ -49,6 +53,37 @@ async function getData (newValue) {
   } catch (err) {
     console.log(err);
   }
+}
+
+function addToList (index) {
+  let info = '';
+  // console.log(JSON.parse(JSON.stringify(result.value[index].meanings)));
+  let arr = JSON.parse(JSON.stringify(result.value[index].meanings));
+  for (var i = 0; i < arr.length; i++) {
+    console.log(arr[i].partOfSpeech);
+    info += arr[i].partOfSpeech;
+    info += ' : '
+    for (var j = 0; j < arr[i].definitions.length; j++) {
+      // console.log(arr[i].definitions[j].definition);
+      info += arr[i].definitions[j].definition;
+      info += ' \n '
+    }
+    info += '\n'
+    // localStorage.setItem(props.searchWord, wordInfo.value)
+  }
+  localStorage.setItem(props.searchWord, info);
+  const msg = () => {
+    ElMessage({
+      message: 'Added to your word list',
+      type: 'success',
+      showClose: true,
+      duration: 5000
+    })
+  }
+  // location.reload();
+  msg();
+
+
 }
 </script>
 
@@ -75,6 +110,10 @@ async function getData (newValue) {
 
 .definition {
   margin-bottom: 10px;
+
+  .addBTN {
+    margin-left: 50px;
+  }
 
   .phonetics {
     margin-bottom: 10px;
@@ -109,9 +148,20 @@ async function getData (newValue) {
     border-bottom: 1px solid #c5bcbc;
 
     div.meaning {
-      .partOfSpeech {
+      .partOfSpeech-night {
         margin-right: 10px;
-        background-color: #3b3e45;
+        background-color: darkgray;
+        opacity: 0.8;
+        display: inline-block;
+        padding-block: 3px;
+        padding-inline: 5px;
+        font-size: 14px;
+        border-radius: 5px;
+        line-height: 25px;
+      }
+      .partOfSpeech-day {
+        margin-right: 10px;
+        background-color: whitesmoke;
         opacity: 0.8;
         display: inline-block;
         padding-block: 3px;
